@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Neighborhood Maps Project</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!--this creates a reference to anchor the list onto-->
+
+      <!-- Todo: Generate table body -->
+      <ul data-bind="foreach: list">
+          <li data-bind="text: locationInfo().name">
+          <li data-bind="text: locationInfo().address">
+    </ul>
+
+  <!--this creates a reference to anchor the map onto -->
+  <div id="map"></div>
+  <!--dont forget, all data requests have to be retrieved async-->
+  <script async src="js/script.js"></script>
+  <script async src="js/library/knockout-3.2.0.js"></script>
+  <script async src="js/library/jquery.min.js"></script>
+
+  <!-- This script obtains the information needed to include the google map, it includes my personal API key as well-->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDh7RWiH62epHGMwD7pusXyhyU6eDDN0Q4&v=3&callback=initMap">
+    </script>
+
+
+</body>
+</html>
