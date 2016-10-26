@@ -1,25 +1,25 @@
 //this creats a variable called map
 var map;
 
+//this is the model! Now its separate and NOW its easier
+//This array of objects holds the location info
+var locationInfo = [
+  {name: 'Ca Momi Osteria', latlong: {lat: 38.2985, lng: -122.2866}, address: '1141 1st St, Napa, CA 94559'},
+  {name: 'La Taberna', latlong: {lat: 38.2980, lng: -122.2848}, address: '815 Main St, Napa, CA 94559'},
+  {name: 'Graces Table', latlong: {lat: 38.2969, lng: -122.2883}, address: '1400 2nd St, Napa, CA 94559'},
+  {name: 'Morimoto', latlong: {lat: 38.2969, lng: -122.2834}, address: '610 Main St, Napa, CA 94559'},
+  {name: 'Oenotri', latlong: {lat: 38.2973, lng: -122.2888}, address: '1425 1st St, Napa, CA 94559'}
+];
+
 
 //this function initializes the map
 function initMap() {
-
   // This constructor creates the new map at the chosen location
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 38.2970, lng: -122.2876},
     zoom: 17
   });
 
-  //This array of objects holds the location info
-  var locationInfo = ko.observableArray( [
-    {name: 'Ca Momi Osteria', latlong: {lat: 38.2985, lng: -122.2866}, address: '1141 1st St, Napa, CA 94559'},
-    {name: 'La Taberna', latlong: {lat: 38.2980, lng: -122.2848}, address: '815 Main St, Napa, CA 94559'},
-    {name: 'Graces Table', latlong: {lat: 38.2969, lng: -122.2883}, address: '1400 2nd St, Napa, CA 94559'},
-    {name: 'Morimoto', latlong: {lat: 38.2969, lng: -122.2834}, address: '610 Main St, Napa, CA 94559'},
-    {name: 'Oenotri', latlong: {lat: 38.2973, lng: -122.2888}, address: '1425 1st St, Napa, CA 94559'}
-  ]);
-  
   //Now we are putting the markers on the initial map
   //This blank array will hold all of the markers info
   var markersArray = [];
@@ -47,7 +47,6 @@ function initMap() {
       populateInfoWindow(this, infowindow);
     });
   }
-
 }
 
 //I think the infoWindow and the marker are both objects
@@ -67,7 +66,22 @@ function populateInfoWindow(marker, infowindow) {
 }
 
 
-ko.applyBindings(new initMap());
+
+// This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
+function appViewModel() {
+  var self = this;
+  //the list view should be populated with a KO array that pushes the above objects into the array. Then Here is where you allow for filtering and click events? Start with adding click events onto the code here
+  var myObservableArray = new Array();
+  self.myObservableArray = ko.observableArray();
+  for(var i=0; i<locationInfo.length; i++){
+    myObservableArray.push(locationInfo[i]);
+  }
+
+  console.log(myObservableArray[0]);
+   }
+
+// Activates knockout.js
+ko.applyBindings(new appViewModel());
 
 
 
