@@ -1,7 +1,7 @@
 //this creats a variable called map
 var map;
 
-//this is the model! Now its separate and NOW its easier
+//this is the model
 //This array of objects holds the location info
 var locationInfo = [
   {name: 'Ca Momi Osteria', latlong: {lat: 38.2985, lng: -122.2866}, address: '1141 1st St, Napa, CA 94559'},
@@ -70,12 +70,34 @@ function populateInfoWindow(marker, infowindow) {
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function appViewModel() {
   var self = this;
-  //the list view should be populated with a KO array that pushes the above objects into the array. Then Here is where you allow for filtering and click events? Start with adding click events onto the code here
+  //the list view should be populated with a KO array that pushes the above objects into the array.
   var myObservableArray = new Array();
   self.myObservableArray = ko.observableArray();
   for(var i=0; i<locationInfo.length; i++){
-    myObservableArray.push(locationInfo[i]);
+    self.myObservableArray.push(locationInfo[i]);
+
   }
+
+
+  //this is the function that will get called when you submit a value into the filter
+  appViewModel.filteredItems = ko.computed(function() {
+ //is the filter parameter a ko observable? does it need to be?
+    var filter = self.filter().toLowerCase();
+    //if no value has been entered, just return the observable array
+    if (!filter) {
+      //should this be "return self.myObservableArray()"
+        return self.items();
+    } else {
+        return ko.utils.arrayFilter(self.items(), function(item) {
+            return ko.utils.stringStartsWith(item.name().toLowerCase(), filter);
+        });
+    }
+  }, appViewModel);
+    //if blank
+    //visableList: ko.observable(true);
+    //else
+    //visableList: ko.observable(false);
+    //I want to control the visibility property of all of the list items here right? But how do I compare the input from the form to the list item to see if the name matches?
 
   console.log(myObservableArray[0]);
    }
@@ -85,8 +107,8 @@ ko.applyBindings(new appViewModel());
 
 
 
+ //We can always control what appears in the list by adding and removing from the list using push and pop, or better yet, hide and visable. However, I still need an input field to collect information
 
- //Next to do. Im done for NOW with googleMaps. Time to move on
 
 //A list of the names of the markers should appear on the left side. This requires KO and it means I have to populate the DOM. Review the KO stuff briefly and read over the rules thouroughly!!
 

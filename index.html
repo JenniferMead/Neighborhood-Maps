@@ -6,11 +6,14 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!--by using value "filter" we are changing the value of the filter variable in the script.js? valueUpdate makes sure the value is updated every time a keystroke is made-->
+  <p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
 
   <!--this creates a reference to anchor the list onto-->
-  <div data-bind="foreach: myObservableArray">
-    <ul data-bind="text: myObservableArray().name"></ul>
-  </div>
+  <ul data-bind="foreach: myObservableArray">
+    <li data-bind="visable: visableList, text: name"></li>
+  </ul>
+
   <!--this creates a reference to anchor the map onto -->
   <div id="map"></div>
 
