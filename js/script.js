@@ -67,48 +67,47 @@ function populateInfoWindow(marker, infowindow) {
 
 
 
-// This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
+// This is a the viewmodel
 function appViewModel() {
   var self = this;
-  //the list view should be populated with a KO array that pushes the above objects into the array.
-  var myObservableArray = new Array();
+  //Is this a property of the appViewModel? Its declaring it as an observable
+  self.filter = ko.observable();
+
+  //Adding as a property a KO array
   self.myObservableArray = ko.observableArray();
+  //This for loop is what actually pushes the locationInfo objects into the observable array
   for(var i=0; i<locationInfo.length; i++){
     self.myObservableArray.push(locationInfo[i]);
-
   }
 
+  //this is a method that is being added to the function. Its a KO computed observable
+  self.filteredItems = ko.computed(function() { console.log(self);
 
-  //this is the function that will get called when you submit a value into the filter
-  appViewModel.filteredItems = ko.computed(function() {
- //is the filter parameter a ko observable? does it need to be?
-    var filter = self.filter().toLowerCase();
     //if no value has been entered, just return the observable array
     if (!filter) {
-      //should this be "return self.myObservableArray()"
-        return self.items();
+        return self.myObservableArray();
     } else {
-        return ko.utils.arrayFilter(self.items(), function(item) {
-            return ko.utils.stringStartsWith(item.name().toLowerCase(), filter);
+         //the variable filter is holding the results of the user input into filter and then converting it to all lower case
+         var filter = self.filter().toLowerCase();
+         //returns an array that contains only those items in the array that is being filtered that pass the true/false test inside the filter
+         return ko.utils.arrayFilter(self.myObservableArray(), function(item) {
+           //return either true or false
+            //indexOf returns the index of the first occurance of a query value. If there is no query value in the string, indexOf returns a -1.
+            //Thus, if you have a match at all, the result must be 0 or greater becuase 0 is the lowest index number. So if you have any result, it will be greater than -1 and so returns true. Otherwise it returns false
+            //do we need to do toLowerCase twice?
+            return item.name.toLowerCase().indexOf(filter) > -1;
         });
     }
+  //do we still need appViewModel here?
   }, appViewModel);
-    //if blank
-    //visableList: ko.observable(true);
-    //else
-    //visableList: ko.observable(false);
-    //I want to control the visibility property of all of the list items here right? But how do I compare the input from the form to the list item to see if the name matches?
 
-  console.log(myObservableArray[0]);
-   }
+  };
 
 // Activates knockout.js
 ko.applyBindings(new appViewModel());
 
 
-
- //We can always control what appears in the list by adding and removing from the list using push and pop, or better yet, hide and visable. However, I still need an input field to collect information
-
+ 
 
 //A list of the names of the markers should appear on the left side. This requires KO and it means I have to populate the DOM. Review the KO stuff briefly and read over the rules thouroughly!!
 
