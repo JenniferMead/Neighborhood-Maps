@@ -9,21 +9,25 @@ var locationInfo = [
   {name: 'La Taberna', latlong: {lat: 38.2980, lng: -122.2848}, address: '815 Main St, Napa, CA 94559'},
   {name: 'Graces Table', latlong: {lat: 38.2969, lng: -122.2883}, address: '1400 2nd St, Napa, CA 94559'},
   {name: 'Morimoto', latlong: {lat: 38.2969, lng: -122.2834}, address: '610 Main St, Napa, CA 94559'},
-  {name: 'Oenotri', latlong: {lat: 38.2973, lng: -122.2888}, address: '1425 1st St, Napa, CA 94559'}
+  {name: 'Oenotri', latlong: {lat: 38.2973, lng: -122.2888}, address: '1425 1st St, Napa, CA 94559'},
+  {name: 'Melted', latlong: {lat: 38.3010, lng: -122.2862}, address: '966 Pearl St, Napa, CA 94559'},
+  {name: 'Alexis Baking Company', latlong: {lat: 38.2955, lng: -122.2888}, address: '1517 3rd St, Napa, CA 94559'}
 ];
-
 
 //this function initializes the map
 function initMap() {
   // This constructor creates the new map at the chosen location
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 38.2970, lng: -122.2876},
+    //I don't think I need this line anymore if I am creating the center below and setting it to the center of the bounds
+    //center: {lat: 38.2970, lng: -122.2876},
     zoom: 17
   });
 
   //The creates the info window
   var infowindow = new google.maps.InfoWindow({
   });
+
+  var bounds = new google.maps.LatLngBounds();
 
   //This for loop is used to create new marker properties and push them into each object in the locationInfo array, making them properties of all of the location objects
   for( i = 0; i<locationInfo.length; i++){
@@ -32,7 +36,8 @@ function initMap() {
       position: locationInfo[i].latlong,
       map: map,
       title: locationInfo[i].name,
-      address: locationInfo[i].address
+      address: locationInfo[i].address,
+      //animation: google.maps.Animation.DROP
     });
 
     //This adds a click event to the marker properties that causes the infoWindow to open upon clicking. It doesn't contain the content yet though.
@@ -40,8 +45,21 @@ function initMap() {
       //Now we are calling the populateInfoWindow function that we set up later
       populateInfoWindow(this, infowindow);
     });
+    bounds.extend(locationInfo[i].marker.position);
+
   }
+  // Extend the boundaries of the map for each marker
+    map.fitBounds(bounds);
+
+    //center the map to the geometric center of all markers. If I do this, aren't I just resetting the center I determined above when I made the map initially?
+    map.setCenter(bounds.getCenter());
 }
+
+//I don't know if the lat long bounds isn't working or if its doing everything it can. It definietly adjusts and keeps everything within the bounds as LONG as I don't move the screen. If I move the screen though,
+//it will not move it back to the marker. Also, it does not adjust the zoom based on how many markers are in the screen and how far apart they are
+//Actualy Im pretty sure its not adjusting becuase its staying the center of the markers but it doesn't know when a marker is being filtered and thus removed from the list? So its not updating?
+
+
 
 console.log(locationInfo);
 
@@ -60,6 +78,7 @@ function populateInfoWindow(marker, infowindow) {
   }
 }
 
+
 // This is a the viewmodel for the KO code
 function appViewModel() {
   var self = this;
@@ -74,44 +93,51 @@ function appViewModel() {
     self.myObservableArray.push(locationInfo[i]);
   }
 
+//Here is where I connect the list to the markers. I've added a click event on the DOM element that connects to this. whenever a list item is clicked, this function is run
+//It basically triggers the click event on the marker
+ self.listClicker = function(locationInfo){
+   google.maps.event.trigger(locationInfo.marker, 'click')
+
+ };
+
   //this is a method that is being added to the function. Its a KO computed observable
   self.filteredItems = ko.computed(function() { console.log(self);
 
     //if no value has been entered, just return the observable array and set the marker to visable
     if (!self.filter()) {
-        self.myObservableArray().marker.setVisible(true);
-        return self.myObservableArray();
-    } else {
+      // loop through locations
+      self.myObservableArray().forEach( function (location) {
+      // if marker poperty exists its sets the visibility to true. It won't exist on load, but it WILL exist after the page has loaded and you have typed in the filter box and then cleared it
+      if (location.marker) {
+        location.marker.setVisible(true);
+      }
+      });
+      return self.myObservableArray();
+    }
+    else {
          //the variable filter is holding the results of the user input into filter and then converting it to all lower case
          var filter = self.filter().toLowerCase();
          //returns an array that contains only those items in the array that is being filtered that pass the true/false test inside the filter
          return ko.utils.arrayFilter(self.myObservableArray(), function(item) {
-           //return either true or false
+            //Holds the result of the filter in a variable that is converted to a number based on how .indexOf works
             //indexOf returns the index of the first occurance of a query value. If there is no query value in the string, indexOf returns a -1.
-            //Thus, if you have a match at all, the result must be 0 or greater becuase 0 is the lowest index number. So if you have any result, it will be greater than -1 and so returns true. Otherwise it returns false
-            //do we need to do toLowerCase twice?
             var result = item.name.toLowerCase().indexOf(filter);
-
-              if (result !== 0) {
+              //If there were no matches between the filter and the list, hide the marker
+              if (result < 0) {
                 item.marker.setVisible(false);
+                //If there were matches, show the marker
               } else {
                  item.marker.setVisible(true);
               }
 
+            //Based on how indexOf works, if you have a match at all, the result must be 0 or greater becuase 0 is the lowest index number.
+            //So if you have any result, it will be greater than -1 and so returns true. Otherwise it returns false
             return item.name.toLowerCase().indexOf(filter) > -1;
         });
     }
-  //do we still need appViewModel here?
   });
 
   };
 
   // Activates knockout.js
   ko.applyBindings(new appViewModel());
-
-  //we need two different functions, one that returns the list basede on the filter and once that returns the markers based on the filter
-  //they both initially load if there is nothing in the filter, but as sooon as their is something in the filter, things are only returned to the list if they are true and markers are only
-  //shown if they are true
-
-  //error handling
-  //I think the problem is that myObservableArray is not connected to the other function?

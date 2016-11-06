@@ -6,12 +6,13 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!--textInput allows automatic updates of the filter variable? or property? based on user input-->
+  <!--textInput allows automatic updates of the filter value based on user input-->
   <p>Filter: <input data-bind="textInput: filter" /></p>
 
   <!--this creates a reference to anchor the list onto. Its saying for each value in the filteredItems array, place the name in a list element on the DOM-->
   <ul data-bind="foreach: filteredItems">
-    <li data-bind="text: name"></li>
+    <!--the $parent is important because This is the view model object in the parent context, the one immeditely outside the current context -->
+    <li data-bind="text: name, click: $parent.listClicker"></li>
   </ul>
 
   <!--this creates a reference to anchor the map onto -->
