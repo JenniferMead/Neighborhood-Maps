@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+ <div id ="filer">
   <!--textInput allows automatic updates of the filter value based on user input-->
   <p>Filter: <input data-bind="textInput: filter" /></p>
 
@@ -14,13 +16,16 @@
     <!--the $parent is important because This is the view model object in the parent context, the one immeditely outside the current context -->
     <li data-bind="text: name, click: $parent.listClicker"></li>
   </ul>
+</div>
 
   <!--this creates a reference to anchor the map onto -->
   <div id="map"></div>
+ <!--Im trying to style the map, but I think you need a container around the map first: http://stackoverflow.com/questions/743214/how-do-i-resize-a-google-map-with-javascript-after-it-has-loaded ; https://www.google.com/search?q=resizing+the+map+google+API&oq=resizing+the+map+google+API&aqs=chrome..69i57.16773j0j7&sourceid=chrome&ie=UTF-8-->
 
+ <!--dont forget, all data requests have to be retrieved async-->
   <script src="js/library/knockout-3.2.0.js"></script>
   <script src="js/library/jquery.min.js"></script>
-  <!--dont forget, all data requests have to be retrieved async-->
+  <script src = "js/library/oauth1/dist/oauth-signature.min.js"></script>
   <script src="js/script.js"></script>
   <!-- This script obtains the information needed to include the google map, it includes my personal API key as well-->
   <script async defer

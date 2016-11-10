@@ -26,7 +26,7 @@ function initMap() {
   //The creates the info window
   var infowindow = new google.maps.InfoWindow({
   });
-
+  //This creates the lat long boundries
   var bounds = new google.maps.LatLngBounds();
 
   //This for loop is used to create new marker properties and push them into each object in the locationInfo array, making them properties of all of the location objects
@@ -37,7 +37,8 @@ function initMap() {
       map: map,
       title: locationInfo[i].name,
       address: locationInfo[i].address,
-      //animation: google.maps.Animation.DROP
+      //This is only doing the initial animation on load, the drop effect. Not bouncing
+      animation: google.maps.Animation.DROP
     });
 
     //This adds a click event to the marker properties that causes the infoWindow to open upon clicking. It doesn't contain the content yet though.
@@ -45,6 +46,12 @@ function initMap() {
       //Now we are calling the populateInfoWindow function that we set up later
       populateInfoWindow(this, infowindow);
     });
+
+    //This adds the click event that calls the function in control of the animation of the marker
+    locationInfo[i].marker.addListener('click', function(){
+     toggleBounce(this);
+    });
+
     bounds.extend(locationInfo[i].marker.position);
 
   }
@@ -54,14 +61,21 @@ function initMap() {
     //center the map to the geometric center of all markers. If I do this, aren't I just resetting the center I determined above when I made the map initially?
     map.setCenter(bounds.getCenter());
 }
-
 //I don't know if the lat long bounds isn't working or if its doing everything it can. It definietly adjusts and keeps everything within the bounds as LONG as I don't move the screen. If I move the screen though,
 //it will not move it back to the marker. Also, it does not adjust the zoom based on how many markers are in the screen and how far apart they are
 //Actualy Im pretty sure its not adjusting becuase its staying the center of the markers but it doesn't know when a marker is being filtered and thus removed from the list? So its not updating?
 
-
-
 console.log(locationInfo);
+
+function toggleBounce(marker) {
+  //If the marker is already animated, stop animation
+  if (marker.getAnimation() !== null) {
+    marker.setAnimation(null);
+  } else {
+    //Otherwise, set animation
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+  }
+}
 
 //This function makes sure that the infowindow appears and sets the content to the correct title, it also clears the window content if the info window is closed
 function populateInfoWindow(marker, infowindow) {
@@ -71,9 +85,11 @@ function populateInfoWindow(marker, infowindow) {
     //This sets the content ofthe info window
     infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>');
     infowindow.open(map, marker);
-    // Make sure the marker property is cleared if the infowindow is closed.
+    // Make sure the infoWindow is cleared if the close button is clicked
     infowindow.addListener('closeclick', function() {
       infowindow.marker = null;
+      //Makes sure the animation of the marker is stopped if the infoWindow close button is clicked
+      marker.setAnimation(null);
     });
   }
 }
@@ -94,10 +110,10 @@ function appViewModel() {
   }
 
 //Here is where I connect the list to the markers. I've added a click event on the DOM element that connects to this. whenever a list item is clicked, this function is run
-//It basically triggers the click event on the marker
+//It basically triggers all of the click events on the marker
+//Shouldn't this actually be in the for loop since we are adding functionalitiy to each of the list items??
  self.listClicker = function(locationInfo){
    google.maps.event.trigger(locationInfo.marker, 'click')
-
  };
 
   //this is a method that is being added to the function. Its a KO computed observable
@@ -138,6 +154,56 @@ function appViewModel() {
   });
 
   };
+
+//Authentication for YELP API
+//Generates a random number and returns it as a string for OAuthentication
+function nonce_generate() {
+  return (Math.floor(Math.random() * 1e12).toString());
+}
+
+//Information given to me from yelp
+var consumer_key = "X7VNY65vm-GvicRE02oSTg";
+var token = "rv11cD_G4XtSoJM2MnvLy1vdA32lXb8w";
+var secret_key = "MUurURfv82G-0QGpjQImc04gi8A";
+var secret_token = "IlHuDvpCNL183-nePGIDH4Tb69g";
+
+
+var yelp_url = "http://api.yelp.com/v2/search";
+
+var parameters = {
+  oauth_consumer_key: consumer_key,
+  oauth_token: token,
+  oauth_nonce: nonce_generate(),
+  oauth_timestamp: Math.floor(Date.now()/1000),
+  oauth_signature_method: 'HMAC-SHA1',
+  oauth_version : '1.0',
+  callback: 'cb',              // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
+  location: 'California',
+  term: 'restaurant',
+  limit: 1
+};
+
+var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, secret_key, secret_token);
+//Store the encoded signature as a property of the parameters object
+parameters.oauth_signature = encodedSignature;
+
+var settings = {
+  url: yelp_url,
+  data: parameters,
+  cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+  dataType: 'jsonp',
+  success: function(results) {
+  // Do stuff with results
+  console.log("success");
+  },
+  error: function() {
+  // Do stuff on fail
+    console.log("fail");
+  }
+  };
+
+  // Send AJAX query via jQuery library.
+  $.ajax(settings);
 
   // Activates knockout.js
   ko.applyBindings(new appViewModel());
