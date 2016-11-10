@@ -167,9 +167,10 @@ var token = "rv11cD_G4XtSoJM2MnvLy1vdA32lXb8w";
 var secret_key = "MUurURfv82G-0QGpjQImc04gi8A";
 var secret_token = "IlHuDvpCNL183-nePGIDH4Tb69g";
 
-
+//Url variable
 var yelp_url = "http://api.yelp.com/v2/search";
 
+//Search parameters for my YELP search
 var parameters = {
   oauth_consumer_key: consumer_key,
   oauth_token: token,
@@ -177,10 +178,11 @@ var parameters = {
   oauth_timestamp: Math.floor(Date.now()/1000),
   oauth_signature_method: 'HMAC-SHA1',
   oauth_version : '1.0',
-  callback: 'cb',              // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
-  location: 'California',
+  // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
+  callback: 'cb',
+  location: '94559',
   term: 'restaurant',
-  limit: 1
+  limit: 10
 };
 
 var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, secret_key, secret_token);
@@ -190,11 +192,13 @@ parameters.oauth_signature = encodedSignature;
 var settings = {
   url: yelp_url,
   data: parameters,
-  cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+  // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+  cache: true,
   dataType: 'jsonp',
   success: function(results) {
   // Do stuff with results
-  console.log("success");
+  console.log(results);
+
   },
   error: function() {
   // Do stuff on fail
@@ -202,7 +206,7 @@ var settings = {
   }
   };
 
-  // Send AJAX query via jQuery library.
+  // Send AJAX query via jQuery library. This is what is actually sending the request
   $.ajax(settings);
 
   // Activates knockout.js
