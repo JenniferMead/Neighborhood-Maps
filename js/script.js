@@ -168,7 +168,7 @@ var secret_key = "MUurURfv82G-0QGpjQImc04gi8A";
 var secret_token = "IlHuDvpCNL183-nePGIDH4Tb69g";
 
 //Url variable
-var yelp_url = "http://api.yelp.com/v2/search";
+var yelp_url = "https://api.yelp.com/v2/business/";
 
 //Search parameters for my YELP search
 var parameters = {
@@ -198,11 +198,13 @@ var settings = {
   success: function(results) {
   // Do stuff with results
   console.log(results);
-
+  //this is what I am working on, but how can I get it to connect to the array? Right now its not updating anything.
+  locationInfo.phone = results.display_phone;
   },
   error: function() {
   // Do stuff on fail
     console.log("fail");
+
   }
   };
 
