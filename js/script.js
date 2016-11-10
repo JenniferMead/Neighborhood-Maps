@@ -5,13 +5,13 @@ var map;
 //This is the model
 //This array of objects holds the location info
 var locationInfo = [
-  {name: 'Ca Momi Osteria', latlong: {lat: 38.2985, lng: -122.2866}, address: '1141 1st St, Napa, CA 94559'},
-  {name: 'La Taberna', latlong: {lat: 38.2980, lng: -122.2848}, address: '815 Main St, Napa, CA 94559'},
-  {name: 'Graces Table', latlong: {lat: 38.2969, lng: -122.2883}, address: '1400 2nd St, Napa, CA 94559'},
-  {name: 'Morimoto', latlong: {lat: 38.2969, lng: -122.2834}, address: '610 Main St, Napa, CA 94559'},
-  {name: 'Oenotri', latlong: {lat: 38.2973, lng: -122.2888}, address: '1425 1st St, Napa, CA 94559'},
-  {name: 'Melted', latlong: {lat: 38.3010, lng: -122.2862}, address: '966 Pearl St, Napa, CA 94559'},
-  {name: 'Alexis Baking Company', latlong: {lat: 38.2955, lng: -122.2888}, address: '1517 3rd St, Napa, CA 94559'}
+  {name: 'Ca Momi Osteria', latlong: {lat: 38.2985, lng: -122.2866}, address: '1141 1st St, Napa, CA 94559', businessId: 'ca-momi-osteria-napa-2'},
+  {name: 'La Taberna', latlong: {lat: 38.2980, lng: -122.2848}, address: '815 Main St, Napa, CA 94559', businessId: 'la-taberna-napa'},
+  {name: 'Graces Table', latlong: {lat: 38.2969, lng: -122.2883}, address: '1400 2nd St, Napa, CA 94559', businessId: 'graces-table-napa'},
+  {name: 'Morimoto Napa', latlong: {lat: 38.2969, lng: -122.2834}, address: '610 Main St, Napa, CA 94559', businessId: 'morimoto-napa-napa'},
+  {name: 'Oenotri', latlong: {lat: 38.2973, lng: -122.2888}, address: '1425 1st St, Napa, CA 94559', businessId: 'oenotri-napa'},
+  {name: 'Melted', latlong: {lat: 38.3010, lng: -122.2862}, address: '966 Pearl St, Napa, CA 94559', businessId: 'melted-napa'},
+  {name: 'Alexis Baking Company', latlong: {lat: 38.2955, lng: -122.2888}, address: '1517 3rd St, Napa, CA 94559', businessId: 'alexis-baking-company-napa'}
 ];
 
 //this function initializes the map
@@ -83,7 +83,7 @@ function populateInfoWindow(marker, infowindow) {
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
     //This sets the content ofthe info window
-    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>');
+    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>');
     infowindow.open(map, marker);
     // Make sure the infoWindow is cleared if the close button is clicked
     infowindow.addListener('closeclick', function() {
@@ -167,49 +167,60 @@ var token = "rv11cD_G4XtSoJM2MnvLy1vdA32lXb8w";
 var secret_key = "MUurURfv82G-0QGpjQImc04gi8A";
 var secret_token = "IlHuDvpCNL183-nePGIDH4Tb69g";
 
-//Url variable
-var yelp_url = "https://api.yelp.com/v2/business/";
+var yelpCaller = function(){
+for(i=0; i<locationInfo.length; i++){
+  //Url variable
+  var yelp_url = "https://api.yelp.com/v2/business/" + locationInfo[i].businessId;
 
-//Search parameters for my YELP search
-var parameters = {
-  oauth_consumer_key: consumer_key,
-  oauth_token: token,
-  oauth_nonce: nonce_generate(),
-  oauth_timestamp: Math.floor(Date.now()/1000),
-  oauth_signature_method: 'HMAC-SHA1',
-  oauth_version : '1.0',
-  // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
-  callback: 'cb',
-  location: '94559',
-  term: 'restaurant',
-  limit: 10
-};
-
-var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, secret_key, secret_token);
-//Store the encoded signature as a property of the parameters object
-parameters.oauth_signature = encodedSignature;
-
-var settings = {
-  url: yelp_url,
-  data: parameters,
-  // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
-  cache: true,
-  dataType: 'jsonp',
-  success: function(results) {
-  // Do stuff with results
-  console.log(results);
-  //this is what I am working on, but how can I get it to connect to the array? Right now its not updating anything.
-  locationInfo.phone = results.display_phone;
-  },
-  error: function() {
-  // Do stuff on fail
-    console.log("fail");
-
-  }
+  //Search parameters for my YELP search
+  var parameters = {
+    oauth_consumer_key: consumer_key,
+    oauth_token: token,
+    oauth_nonce: nonce_generate(),
+    oauth_timestamp: Math.floor(Date.now()/1000),
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_version : '1.0',
+    // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
+    callback: 'cb',
+    location: '94559',
+    term: 'restaurant',
+    limit: 10
   };
 
-  // Send AJAX query via jQuery library. This is what is actually sending the request
-  $.ajax(settings);
+  var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, secret_key, secret_token);
+  //Store the encoded signature as a property of the parameters object
+  parameters.oauth_signature = encodedSignature;
+
+
+
+    var settings = {
+    url: yelp_url,
+    data: parameters,
+    // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+    cache: true,
+    dataType: 'jsonp',
+    success: function(results) {
+    // Do stuff with results
+    console.log(results);
+    //this is what I am working on, but how can I get it to connect to the array? Right now its not updating anything.
+    locationInfo[i].marker.phone =  results.display_phone;
+    },
+    error: function() {
+    // Do stuff on fail
+      console.log("fail");
+
+    }
+    };
+
+
+    // Send AJAX query via jQuery library. This is what is actually sending the request
+    $.ajax(settings);
+}
+}
+yelpCaller();
+
+
+
 
   // Activates knockout.js
   ko.applyBindings(new appViewModel());
