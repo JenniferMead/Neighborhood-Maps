@@ -10,7 +10,7 @@ Download the code by selecting 'Download ZIP'. Then simply open the frontend-nan
 
 #Resources
 
-[Udacity Front-End Web Developer Nanodegree program](https://classroom.udacity.com/nanodegrees/nd001/syllabus) and forums
+[Udacity Front-End Web Developer Nanodegree program](https://classroom.udacity.com/nanodegrees/nd001/syllabus) and forums (this includes reading previously posted questions in the forums as well as asking my own questions)
 
 [Google Maps API](https://developers.google.com/maps/documentation/javascript/)
 [Yelp API 2.0](https://www.yelp.com/developers/documentation/v2/search_api)
