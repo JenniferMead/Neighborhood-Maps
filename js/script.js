@@ -16,6 +16,22 @@ var locationInfo = [
 
 //this function initializes the map
 function initMap() {
+  var text = 'Google maps';
+  var paragraph = document.createElement('p');
+  //If I did this right its error handling for when the google maps script hasn't loaded yet. I got help with this idea here: http://codepen.io/SittingFox/pen/yYbwwE?editors=001
+  //I don't know how I can test this one though becuase it doesn't seem to work when the internet is full disconnected so I don't know if its working or not
+  //I based it off of suggestions found here: https://discussions.udacity.com/t/handling-google-maps-in-async-and-fallback/34282?_ga=1.32303357.258409296.1477275507
+  //I don't know if I even need this actually
+  if(typeof google === 'undefined'){
+    text += 'is not loaded';
+    paragraph.innerHTML = text;
+
+    // Add paragraph to page
+    var body = document.getElementsById('mapWrapper');
+    body.appendChild(paragraph);
+  }
+
+  else{
   // This constructor creates the new map at the chosen location
   map = new google.maps.Map(document.getElementById('map'), {
     //I don't think I need this line anymore if I am creating the center below and setting it to the center of the bounds
@@ -61,6 +77,7 @@ function initMap() {
     //center the map to the geometric center of all markers. If I do this, aren't I just resetting the center I determined above when I made the map initially?
     map.setCenter(bounds.getCenter());
 }
+}
 //I don't know if the lat long bounds isn't working or if its doing everything it can. It definietly adjusts and keeps everything within the bounds as LONG as I don't move the screen. If I move the screen though,
 //it will not move it back to the marker. Also, it does not adjust the zoom based on how many markers are in the screen and how far apart they are
 //Actualy Im pretty sure its not adjusting becuase its staying the center of the markers but it doesn't know when a marker is being filtered and thus removed from the list? So its not updating?
@@ -83,7 +100,7 @@ function populateInfoWindow(marker, infowindow) {
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
     //This sets the content ofthe info window
-    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>');
+    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>'+'<p>' + 'Information obtained from Yelp' + '</p>');
     infowindow.open(map, marker);
     // Make sure the infoWindow is cleared if the close button is clicked
     infowindow.addListener('closeclick', function() {
@@ -167,10 +184,14 @@ var token = "rv11cD_G4XtSoJM2MnvLy1vdA32lXb8w";
 var secret_key = "MUurURfv82G-0QGpjQImc04gi8A";
 var secret_token = "IlHuDvpCNL183-nePGIDH4Tb69g";
 
-var yelpCaller = function(){
-for(i=0; i<locationInfo.length; i++){
+
+
+
+//This is the function that contains the actual ajax request, but it isn't called until later
+var yelpCaller = function(place){
+
   //Url variable
-  var yelp_url = "https://api.yelp.com/v2/business/" + locationInfo[i].businessId;
+  var yelp_url = "https://api.yelp.com/v2/business/" + place.businessId;
 
   //Search parameters for my YELP search
   var parameters = {
@@ -193,7 +214,7 @@ for(i=0; i<locationInfo.length; i++){
 
 
 
-    var settings = {
+  var settings = {
     url: yelp_url,
     data: parameters,
     // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
@@ -202,25 +223,33 @@ for(i=0; i<locationInfo.length; i++){
     success: function(results) {
     // Do stuff with results
     console.log(results);
-    //this is what I am working on, but how can I get it to connect to the array? Right now its not updating anything.
-    locationInfo[i].marker.phone =  results.display_phone;
+    //This creates a property called phone on the marker and makes it equal to the phone number from the results
+    place.marker.phone =  results.display_phone;
     },
     error: function() {
-    // Do stuff on fail
+    place.marker.phone = 'Yelp cannot be reached';
       console.log("fail");
 
     }
     };
 
 
-    // Send AJAX query via jQuery library. This is what is actually sending the request
-    $.ajax(settings);
+  // Send AJAX query via jQuery library. This is what is actually sending the request
+  $.ajax(settings);
 }
-}
-yelpCaller();
 
-
-
+//This loops through all of the objects in the location array and calls the function that retrieves the phone numbers from the restuarants and stores the data in the appropriate locationInfo object
+for(i=0; i<locationInfo.length; i++){
+  yelpCaller(locationInfo[i]);
+};
 
   // Activates knockout.js
   ko.applyBindings(new appViewModel());
+
+ $( '.menuButton' ).click(function(){
+    $('.responsive-menu').toggleClass('expand');
+});
+
+function googleError(){
+  alert("Google maps is not loading. Please check your internet connection");
+}
