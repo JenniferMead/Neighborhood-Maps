@@ -1,6 +1,5 @@
-//This creats a variable called map
+//This creates a variable called map
 var map;
-
 
 //This is the model
 //This array of objects holds the location info
@@ -14,32 +13,17 @@ var locationInfo = [
   {name: 'Alexis Baking Company', latlong: {lat: 38.2955, lng: -122.2888}, address: '1517 3rd St, Napa, CA 94559', businessId: 'alexis-baking-company-napa'}
 ];
 
-
 //this function initializes the map
 function initMap() {
-  var text = 'Google maps';
-  var paragraph = document.createElement('p');
-  //This is error handling for when the google maps script hasn't loaded yet. I got help with this idea here: http://codepen.io/SittingFox/pen/yYbwwE?editors=001 and here: https://discussions.udacity.com/t/handling-google-maps-in-async-and-fallback/34282?_ga=1.32303357.258409296.1477275507
-  if(typeof google === 'undefined'){
-    text += 'is not loaded';
-    paragraph.innerHTML = text;
-    //Add paragraph to page explaining that Google maps is not loaded
-    var body = document.getElementsById('mapWrapper');
-    body.appendChild(paragraph);
-  }
-
-  else{
     // This constructor creates the new map at the chosen location
     map = new google.maps.Map(document.getElementById('map'), {
     zoom: 17
     });
-
     //The creates the info window
     var infowindow = new google.maps.InfoWindow({
     });
     //This creates the lat long boundries
     var bounds = new google.maps.LatLngBounds();
-
     //This for loop is used to create new marker properties and push them into each object in the locationInfo array, making them properties of all of the location objects
     for( i = 0; i<locationInfo.length; i++){
       //Creates each marker as a property of an object in the locationInfo array
@@ -50,34 +34,27 @@ function initMap() {
       address: locationInfo[i].address,
       animation: google.maps.Animation.DROP
     });
-
     //This adds a click event to the marker properties that causes the infoWindow to open upon clicking. It doesn't contain the content yet though.
     locationInfo[i].marker.addListener('click', function(){
       //Now we are calling the populateInfoWindow function that we set up later
       populateInfoWindow(this, infowindow);
     });
-
     //This adds the click event that calls the function in control of the animation of the marker
     locationInfo[i].marker.addListener('click', function(){
       toggleBounce(this);
     });
-
     bounds.extend(locationInfo[i].marker.position);
-
     }
     // Extend the boundaries of the map for each marker
     map.fitBounds(bounds);
-
-    //center the map to the geometric center of all markers. If I do this, aren't I just resetting the center I determined above when I made the map initially?
+    //center the map to the geometric center of all markers.
     map.setCenter(bounds.getCenter());
-  }
 }
-
 
 //This function toggles the marker between bouncing and not bouncing
 function toggleBounce(marker) {
   //This makes sure that all markers have stopped bouncing first
-  for(i=0; i<locationInfo.length; i++){
+  for(var i=0; i<locationInfo.length; i++){
       locationInfo[i].marker.setAnimation(null);
   };
   //If the marker is already animated, stop animation
@@ -88,7 +65,6 @@ function toggleBounce(marker) {
     marker.setAnimation(google.maps.Animation.BOUNCE);
   }
 }
-
 
 //This function makes sure that the infowindow appears and sets the content to the correct information, it also clears the window content if the info window is closed
 function populateInfoWindow(marker, infowindow) {
@@ -107,7 +83,6 @@ function populateInfoWindow(marker, infowindow) {
   }
 }
 
-
 //This is a the viewmodel for the KO code
 function appViewModel() {
   var self = this;
@@ -119,16 +94,13 @@ function appViewModel() {
   for(var i=0; i<locationInfo.length; i++){
     self.myObservableArray.push(locationInfo[i]);
   }
-
   //Here is where I connect the list to the markers. I've added a click event on the DOM element that connects to this. whenever a list item is clicked, this function is run
   //It basically triggers all of the click events on the marker
   self.listClicker = function(locationInfo){
     google.maps.event.trigger(locationInfo.marker, 'click')
   };
-
   //This is a method that is being added to the function. Its a KO computed observable
   self.filteredItems = ko.computed(function() { console.log(self);
-
   //if no value has been entered, just return the observable array and set the marker to visable
   if (!self.filter()) {
     // loop through locations
@@ -140,7 +112,6 @@ function appViewModel() {
     });
       return self.myObservableArray();
   }
-
   else {
     //the variable filter is holding the results of the user input into filter and then converting it to all lower case
     var filter = self.filter().toLowerCase();
@@ -157,7 +128,6 @@ function appViewModel() {
         else {
           item.marker.setVisible(true);
         }
-
         //Based on how indexOf works, if you have a match at all, the result must be 0 or greater becuase 0 is the lowest index number.
         //So if you have any result, it will be greater than -1 and so returns true. Otherwise it returns false
         return item.name.toLowerCase().indexOf(filter) > -1;
@@ -165,7 +135,6 @@ function appViewModel() {
     }
   });
 };
-
 
 //Authentication for YELP API
 //Generates a random number and returns it as a string for OAuthentication
@@ -179,12 +148,10 @@ var token = "rv11cD_G4XtSoJM2MnvLy1vdA32lXb8w";
 var secret_key = "MUurURfv82G-0QGpjQImc04gi8A";
 var secret_token = "IlHuDvpCNL183-nePGIDH4Tb69g";
 
-
 //This is the function that contains the actual ajax request, but it isn't called until later
 var yelpCaller = function(place){
   //Url variable
   var yelp_url = "https://api.yelp.com/v2/business/" + place.businessId;
-
   //Search parameters for my YELP search
   var parameters = {
     oauth_consumer_key: consumer_key,
@@ -199,13 +166,9 @@ var yelpCaller = function(place){
     term: 'restaurant',
     limit: 10
   };
-
   var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, secret_key, secret_token);
   //Store the encoded signature as a property of the parameters object
   parameters.oauth_signature = encodedSignature;
-
-
-
   var settings = {
     url: yelp_url,
     data: parameters,
@@ -215,31 +178,35 @@ var yelpCaller = function(place){
     success: function(results) {
     // Do stuff with results
     console.log(results);
-    //This creates a property called phone on the marker and makes it equal to the phone number from the results
-    place.marker.phone =  results.display_phone;
+    //If YELP doesn't return any phone number data (so the result is undefined), an error message is displayed
+    if(results.display_phone == undefined){
+      place.marker.phone = "No phone number provided";
+    }
+    else{
+      //This creates a property called phone on the marker and makes it equal to the phone number from the results
+      place.marker.phone =  results.display_phone;
+    }
     },
     error: function() {
     place.marker.phone = 'Yelp cannot be reached';
       console.log("fail");
-
     }
   };
-
 
   // Send AJAX query via jQuery library. This is what is actually sending the request
   $.ajax(settings);
 }
 
 //This loops through all of the objects in the location array and calls the function that retrieves the phone numbers from the restuarants and stores the data in the appropriate locationInfo object
-for(i=0; i<locationInfo.length; i++){
+for(var i=0; i<locationInfo.length; i++){
   yelpCaller(locationInfo[i]);
 };
 
-  // Activates knockout.js
-  ko.applyBindings(new appViewModel());
+// Activates knockout.js
+ko.applyBindings(new appViewModel());
 
- $( '.menuButton' ).click(function(){
-    $('.responsive-menu').toggleClass('expand');
+$( '.menuButton' ).click(function(){
+  $('.responsive-menu').toggleClass('expand');
 });
 
 function googleError(){

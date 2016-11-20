@@ -1,21 +1,17 @@
   <!DOCTYPE html>
 <html lang="en">
-<head>
-
+ <head>
     <meta charset="UTF-8">
     <title>Neighborhood Maps Project</title>
     <meta name=viewport content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel= "stylesheet" media="screen and (max-width:500px)" href="css/styleMobile.css">
     <link rel= "stylesheet" media="screen and (max-width:600px)" href="css/styleIpad.css">
-
 </head>
 <body>
-
   <div class = "column">
     <h1>Favorite Restaurants in Napa</h1>
   </div>
-
 <div class ="row">
     <!--Hamberger icon code-->
     <!--I got help for the hamburger menu code from this website: http://www.internetkultur.at/simple-hamburger-drop-down-menu-with-css-and-jquery/ -->
@@ -27,12 +23,11 @@
   	    <span></span>
       </div>
     </div>
-
   <div class="responsive-menu">
     <div id ="filter" class="col-3">
       <p>Search </p>
       <!--textInput allows automatic updates of the filter value based on user input-->
-      <input data-bind="textInput: filter" />
+      <input data-bind="textInput: filter">
       <!--this creates a reference to anchor the list onto. Its saying for each value in the filteredItems array, place the name in a list element on the DOM-->
       <ul data-bind="foreach: filteredItems">
         <!--the $parent is important because This is the view model object in the parent context, the one immeditely outside the current context -->
@@ -40,24 +35,18 @@
       </ul>
     </div>
   </div>
-
   <!--Google maps code-->
   <div id ="mapWrapper" class="col-9">
     <!--this creates a reference to anchor the map onto -->
     <div id="map"></div>
   </div>
-
 </div>
-
   <!--Script sources for libraries I am using-->
   <script src="js/library/knockout-3.2.0.js"></script>
-  <script src="js/library/jquery.min.js"></script>
+  <script src="js/library/jqueryVS3.min.js"></script>
   <script src ="js/library/oauth1/dist/oauth-signature.min.js"></script>
   <script src="js/script.js"></script>
   <!-- This script obtains the information needed to include the google map, it includes my personal API key as well-->
-  <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDh7RWiH62epHGMwD7pusXyhyU6eDDN0Q4&v=3&callback=initMap" onerror="googleError()">
-    </script>
-
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDh7RWiH62epHGMwD7pusXyhyU6eDDN0Q4&v=3&callback=initMap" onerror="googleError()"></script>
 </body>
 </html>
