@@ -72,7 +72,7 @@ function populateInfoWindow(marker, infowindow) {
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
     //This sets the content ofthe info window
-    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>'+'<p>' + 'Information obtained from Yelp' + '</p>');
+    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>');
     infowindow.open(map, marker);
     // Make sure the infoWindow is cleared if the close button is clicked
     infowindow.addListener('closeclick', function() {
@@ -180,7 +180,7 @@ var yelpCaller = function(place){
     console.log(results);
     //If YELP doesn't return any phone number data (so the result is undefined), an error message is displayed
     if(results.display_phone == undefined){
-      place.marker.phone = "No phone number provided";
+      place.marker.phone = "No phone number provided by Yelp API";
     }
     else{
       //This creates a property called phone on the marker and makes it equal to the phone number from the results
@@ -188,7 +188,7 @@ var yelpCaller = function(place){
     }
     },
     error: function() {
-    place.marker.phone = 'Yelp cannot be reached';
+    place.marker.phone = 'Yelp API data could not be retrieved';
       console.log("fail");
     }
   };
