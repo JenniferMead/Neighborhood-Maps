@@ -62,6 +62,10 @@ li{
   color: black;
 }
 
+#yelpLogo{
+  max-width: 60px;
+}
+
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

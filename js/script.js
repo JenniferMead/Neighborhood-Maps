@@ -72,7 +72,7 @@ function populateInfoWindow(marker, infowindow) {
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
     //This sets the content ofthe info window
-    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>');
+    infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>' + '<img id ="yelpLogo" src = "yelpLogo.jpg">');
     infowindow.open(map, marker);
     // Make sure the infoWindow is cleared if the close button is clicked
     infowindow.addListener('closeclick', function() {
